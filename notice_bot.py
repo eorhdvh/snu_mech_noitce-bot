@@ -1,36 +1,45 @@
-import os
 import requests
 from bs4 import BeautifulSoup
+import os
+import urllib3
 
-URL = "https://me.snu.ac.kr/ko/board/notice"  # 기계공학부 공지사항 페이지
-WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK")  # GitHub Secrets로부터 불러오기
+# SSL 경고 비활성화
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-def fetch_latest_notice():
-    res = requests.get(URL)
+DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
+URL = "https://me.snu.ac.kr/ko/board/notice"
+
+def fetch_notices():
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0 Safari/537.36"
+    }
+    res = requests.get(URL, headers=headers, verify=False)
     res.raise_for_status()
     soup = BeautifulSoup(res.text, "html.parser")
 
-    # 공지사항 첫 번째 항목의 제목과 링크 가져오기
-    first_post = soup.select_one("table tbody tr td.title a")  # ← 올바른 선택자
-    if not first_post:
-        raise Exception("공지사항 항목을 찾을 수 없습니다. CSS 선택자를 다시 확인하세요.")
+    # 게시글 제목과 링크 추출 (사이트 구조에 맞춰 수정 필요)
+    notices = []
+    for a in soup.select("td.title a"):  # 실제 사이트 HTML 구조 확인 필요
+        title = a.get_text(strip=True)
+        link = a["href"]
+        if not link.startswith("http"):
+            link = "https://me.snu.ac.kr" + link
+        notices.append(f"{title}\n{link}")
+    return notices[:5]  # 최신 5개만
 
-    title = first_post.text.strip()
-    link = "https://me.snu.ac.kr" + first_post.get("href")  # 상대경로 → 절대경로로 변환
-    return title, link
-
-def send_to_discord(title, link):
-    data = {
-        "content": f"새로운 공지사항: **{title}**\n{link}"
-    }
-    response = requests.post(WEBHOOK_URL, json=data)
-    print("디스코드 응답 코드:", response.status_code)
-    print("응답 내용:", response.text)
+def send_to_discord(messages):
+    if not DISCORD_WEBHOOK_URL:
+        print("DISCORD_WEBHOOK_URL이 설정되지 않았습니다.")
+        return
+    content = "\n\n".join(messages)
+    payload = {"content": content}
+    res = requests.post(DISCORD_WEBHOOK_URL, json=payload)
+    res.raise_for_status()
+    print("디스코드로 공지사항 전송 완료")
 
 if __name__ == "__main__":
-    try:
-        title, link = fetch_latest_notice()
-        print("크롤링 결과:", title, link)  # 디버그용
-        send_to_discord(title, link)
-    except Exception as e:
-        print("오류 발생:", e)
+    notices = fetch_notices()
+    if notices:
+        send_to_discord(notices)
+    else:
+        print("공지사항을 가져오지 못했습니다.")
