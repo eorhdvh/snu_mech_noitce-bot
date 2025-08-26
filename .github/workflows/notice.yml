@@ -1,0 +1,19 @@
+name: Notice Bot
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"  # 30분마다 실행
+  workflow_dispatch:        # 수동 실행 버튼도 활성화
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - run: pip install requests beautifulsoup4
+      - run: python notice_bot.py
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
