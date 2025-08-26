@@ -2,7 +2,7 @@ import os
 import requests
 from bs4 import BeautifulSoup
 
-URL = "https://me.snu.ac.kr/%ed%95%99%eb%b6%80-%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/"  # 올바른 URL
+URL = "https://me.snu.ac.kr/%ed%95%99%eb%b6%80-%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/document/21008/"  # 올바른 URL
 WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK")
 
 def fetch_latest_notice():
