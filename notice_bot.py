@@ -10,7 +10,7 @@ def fetch_latest_notice():
     res.raise_for_status()
     soup = BeautifulSoup(res.text, "html.parser")
     # 공지사항 첫 번째 글의 제목과 링크 (CSS 선택자는 실제 사이트에 맞춰야 함)
-    first_post = soup.select_one(".view-content .views-row a")
+    first_post = soup.select_one(".views-field-title a")
     title = first_post.text.strip()
     link = "https://me.snu.ac.kr" + first_post.get("href")
     return title, link
