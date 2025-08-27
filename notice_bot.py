@@ -35,6 +35,6 @@ if __name__ == "__main__":
         print("✅ 크롤링 성공!")
         print(f"   - 제목: {latest_title}")
         print(f"   - 링크: {latest_link}")
-        # send_to_discord(latest_title, latest_link) # 필요 시 주석 해제
+        send_to_discord(latest_title, latest_link) # 필요 시 주석 해제
     except Exception as e:
         print(f"❌ 오류 발생: {e}")
