@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 
 # 1. 올바른 공지사항 '목록' 페이지 주소로 변경
-URL = "https://me.snu.ac.kr/ko/board/notice" 
+URL = "https://me.snu.ac.kr/%ed%95%99%eb%b6%80-%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/" 
 # WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK") # 실제 사용 시 주석 해제
 # 테스트를 위해 임시 WEBHOOK_URL을 사용하거나, 아래 send_to_discord 함수 호출 부분을 주석 처리하세요.
 WEBHOOK_URL = "YOUR_DISCORD_WEBHOOK_URL_HERE" # 이 부분은 실제 웹훅 주소로 변경해야 합니다.
