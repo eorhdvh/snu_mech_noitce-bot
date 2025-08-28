@@ -1,4 +1,4 @@
-name: Check SNU ME Notice
+name: Notice Bot
 
 on:
   schedule:
