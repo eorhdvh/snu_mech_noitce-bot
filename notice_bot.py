@@ -59,33 +59,26 @@ def send_to_discord(title, link):
 
 # --- 메인 실행 로직 ---
 if __name__ == "__main__":
-    # 1. 이전에 저장된 공지사항 제목을 읽어옵니다.
-    try:
-        with open(LAST_NOTICE_FILE, "r", encoding="utf-8") as f:
-            last_title = f.read().strip()
-    except FileNotFoundError:
-        # 파일이 없으면 (최초 실행 시) 빈 문자열로 처리합니다.
-        last_title = ""
+    # ... (이전 코드 동일)
+    try:
+        # 2. 웹사이트에서 현재 최신 공지사항을 가져옵니다.
+        latest_title, latest_link = fetch_latest_notice()
+        print("✅ 크롤링 성공!")
+        print(f"   - 현재 최신 제목: {latest_title}")
+        print(f"   - 이전에 보낸 제목: {last_title if last_title else '없음'}")
 
-    try:
-        # 2. 웹사이트에서 현재 최신 공지사항을 가져옵니다.
-        latest_title, latest_link = fetch_latest_notice()
-        print("✅ 크롤링 성공!")
-        print(f"   - 현재 최신 제목: {latest_title}")
-        print(f"   - 이전에 보낸 제목: {last_title if last_title else '없음'}")
+        # 3. 이전 제목과 현재 제목을 비교합니다.
+        if latest_title != last_title:
+            # 4. 두 제목이 다르면, 새로운 공지사항으로 판단하고 알림을 보냅니다.
+            print("🚀 새로운 공지사항을 발견했습니다! 알림을 보냅니다.")
+            send_to_discord(latest_title, latest_link)
+        else:
+            # 6. 두 제목이 같으면, 아무것도 하지 않습니다.
+            print("✅ 새로운 공지사항이 없습니다. 알림을 보내지 않습니다.")
+            
+        # >>> 이 부분이 핵심입니다! 알림 전송 여부와 상관없이 파일을 업데이트합니다. <<<
+        with open(LAST_NOTICE_FILE, "w", encoding="utf-8") as f:
+            f.write(latest_title)
 
-        # 3. 이전 제목과 현재 제목을 비교합니다.
-        if latest_title != last_title:
-            # 4. 두 제목이 다르면, 새로운 공지사항으로 판단하고 알림을 보냅니다.
-            print("🚀 새로운 공지사항을 발견했습니다! 알림을 보냅니다.")
-            send_to_discord(latest_title, latest_link)
-            
-            # 5. 알림을 보낸 후, 파일에 새로운 제목을 덮어씁니다.
-            with open(LAST_NOTICE_FILE, "w", encoding="utf-8") as f:
-                f.write(latest_title)
-        else:
-            # 6. 두 제목이 같으면, 아무것도 하지 않습니다.
-            print("✅ 새로운 공지사항이 없습니다. 알림을 보내지 않습니다.")
-            
-    except Exception as e:
-        print(f"❌ 오류 발생: {e}")
+    except Exception as e:
+        print(f"❌ 오류 발생: {e}")
