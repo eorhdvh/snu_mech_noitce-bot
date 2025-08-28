@@ -4,8 +4,13 @@ from bs4 import BeautifulSoup
 
 # 크롤링할 목표 URL
 URL = "https://me.snu.ac.kr/%ed%95%99%eb%b6%80-%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/"
-# 마지막으로 보낸 공지사항 제목을 저장할 파일 이름
-LAST_NOTICE_FILE = "last_notice.txt"
+
+# 스크립트가 위치한 디렉토리 경로를 얻습니다.
+# os.path.abspath(__file__)은 현재 파일의 절대 경로를 반환합니다.
+# os.path.dirname()을 사용해 그 경로에서 디렉토리 부분만 추출합니다.
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+# 이 디렉토리에 'last_notice.txt' 파일을 저장하도록 경로를 설정합니다.
+LAST_NOTICE_FILE = os.path.join(SCRIPT_DIR, "last_notice.txt")
 
 def fetch_latest_notice():
     """
