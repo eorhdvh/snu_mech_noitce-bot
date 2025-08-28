@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 
 # 크롤링할 목표 URL
-URL = "https://me.snu.ac.kr/%ea%b3%b5%ed%86%b5-%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/"
+URL = "https://me.snu.ac.kr/%ed%95%99%eb%b6%80-%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/"
 # 마지막으로 보낸 공지사항 제목을 저장할 파일 이름
 LAST_NOTICE_FILE = "last_notice.txt"
 
