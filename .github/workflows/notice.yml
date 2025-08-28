@@ -1,19 +1,45 @@
-name: Notice Bot
+name: Check SNU ME Notice
 
 on:
   schedule:
-    - cron: "*/30 * * * *"  # 30분마다 실행
-  workflow_dispatch:        # 수동 실행 버튼도 활성화
+    # 매일 1시간마다 실행
+    - cron: '0 * * * *'
 
 jobs:
-  run:
+  check-notice:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.9
-      - run: pip install requests beautifulsoup4
-      - run: python notice_bot.py
+          python-version: '3.x'
+
+      # 1. 이전 워크플로에서 저장된 last_notice.txt 파일 다운로드
+      - name: Download last notice artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: last-notice-file
+          path: .
+          
+      # 2. 필요한 Python 라이브러리 설치
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+
+      # 3. 파이썬 스크립트 실행
+      - name: Run notice bot
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: python notice_bot.py
+
+      # 4. 새로 업데이트된 last_notice.txt 파일 업로드
+      - name: Upload new last notice artifact
+        # 'if' 조건은 새로운 공지가 발견되었을 때만 파일을 업로드하도록 함
+        # 이 조건은 스크립트에서 마지막에 특정 파일을 생성하는 로직이 필요
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: last-notice-file
+          path: last_notice.txt
