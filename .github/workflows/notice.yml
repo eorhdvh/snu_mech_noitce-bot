@@ -23,7 +23,16 @@ jobs:
         with:
           name: last-notice-file
           path: .
-        continue-on-error: true # <-- 이 부분을 추가합니다.
+        continue-on-error: true
+
+      - name: Check file content
+        run: |
+          if [ -f "last_notice.txt" ]; then
+            echo "File exists. Content:"
+            cat last_notice.txt
+          else
+            echo "File does not exist."
+          fi
           
       - name: Install dependencies
         run: pip install requests beautifulsoup4
