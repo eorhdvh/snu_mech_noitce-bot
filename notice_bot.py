@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 
 # 크롤링할 목표 URL
 URL = "https://me.snu.ac.kr/%ed%95%99%eb%b6%80-%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/"
+
 # 스크립트가 위치한 디렉토리 경로를 얻어 파일을 저장할 위치를 지정합니다.
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 LAST_NOTICE_FILE = os.path.join(SCRIPT_DIR, "last_notice.txt")
