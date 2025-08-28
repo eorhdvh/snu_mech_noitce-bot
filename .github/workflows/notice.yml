@@ -17,11 +17,13 @@ jobs:
         with:
           python-version: '3.x'
 
+      # 1. 이전 워크플로에서 저장된 last_notice.txt 파일 다운로드
       - name: Download last notice artifact
         uses: actions/download-artifact@v4
         with:
           name: last-notice-file
           path: .
+        continue-on-error: true # <-- 이 부분을 추가합니다.
           
       - name: Install dependencies
         run: pip install requests beautifulsoup4
@@ -31,6 +33,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: python notice_bot.py
 
+      # 2. 새로 업데이트된 last_notice.txt 파일 업로드
       - name: Upload new last notice artifact
         if: success()
         uses: actions/upload-artifact@v4
