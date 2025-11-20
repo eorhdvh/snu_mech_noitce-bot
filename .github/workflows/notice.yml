@@ -5,6 +5,10 @@ on:
     - cron: '0 * * * *'
   workflow_dispatch:
 
+# [필수] 봇이 저장소에 파일을 쓸 수 있는 권한 부여
+permissions:
+  contents: write
+
 jobs:
   check-notice:
     runs-on: ubuntu-latest
@@ -17,13 +21,8 @@ jobs:
         with:
           python-version: '3.x'
 
-      # 캐시를 불러옵니다. 키는 워크플로의 고유 식별자로 설정합니다.
-      - name: Cache last notice file
-        id: cache
-        uses: actions/cache@v4
-        with:
-          path: last_notice.txt
-          key: ${{ runner.os }}-last-notice
+      # ❌ 기존의 'Cache last notice file' 단계는 삭제했습니다.
+      # 캐시는 데이터베이스처럼 실시간 변동 사항을 저장하는 데 적합하지 않습니다.
 
       - name: Install dependencies
         run: pip install requests beautifulsoup4
@@ -31,4 +30,22 @@ jobs:
       - name: Run notice bot
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        # 💡 사용자분의 파일명(notice_bot.py)에 맞췄습니다.
         run: python notice_bot.py
+
+      # ✅ [핵심 수정] 변경된 파일을 캐시가 아닌 저장소에 직접 저장합니다.
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          
+          # 파일이 존재할 경우에만 add (최초 실행 에러 방지)
+          if [ -f last_notice.txt ]; then
+            git add last_notice.txt
+            # 변경사항이 있는지 확인 후 커밋 & 푸시
+            git diff --quiet && git diff --staged --quiet || (git commit -m "Update last notice [skip ci]" && git push)
+          fi
+
+      # ✅ 60일 뒤 워크플로우가 자동으로 멈추는 것을 방지합니다.
+      - name: Keepalive Workflow
+        uses: gautamkrishnar/keepalive-workflow@v1
