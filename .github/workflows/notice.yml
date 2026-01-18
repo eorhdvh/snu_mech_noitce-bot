@@ -30,22 +30,29 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: python notice_bot.py
 
-      # 2. [추가됨] 장학 공지 봇 실행
+      # 2. 장학 공지 봇 실행
       - name: Run scholarship bot
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: python scholarship_bot.py
 
-      # [핵심] 변경된 파일들(공지, 장학)을 저장소에 저장
+      # 3. [추가됨] 공통 공지 봇 실행
+      - name: Run common notice bot
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: python common_notice_bot.py
+
+      # [핵심] 변경된 파일들(공지, 장학, 공통)을 저장소에 저장
       - name: Commit and push if changed
         run: |
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
           
-          # 두 텍스트 파일이 존재하는지 확인하고 스테이징(git add)
+          # 세 가지 텍스트 파일이 존재하는지 확인하고 스테이징(git add)
           # 파일이 없으면 에러가 나지 않도록 조건문으로 처리
           [ -f last_notice.txt ] && git add last_notice.txt
           [ -f last_scholarship_notice.txt ] && git add last_scholarship_notice.txt
+          [ -f last_common_notice.txt ] && git add last_common_notice.txt
 
           # 변경사항이 있는지 확인 (하나라도 변경되었으면 commit 실행)
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update notice files [skip ci]" && git push)
